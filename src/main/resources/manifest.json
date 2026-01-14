@@ -1,0 +1,24 @@
+{
+    "Group": "dev.zonary123",
+    "Name": "ZEconomy",
+    "Version": "1.0.0",
+    "Description": "A plugin that adds an economy system.",
+    "Authors": [
+        {
+            "Name": "zonary123",
+            "Email": "carlosvarasalonso10@gmail.com",
+            "Url": "https://your-website.com"
+        }
+    ],
+    "Website": "https://your-plugin-website.com",
+    "ServerVersion": "*",
+    "Dependencies": {
+        
+    },
+    "OptionalDependencies": {
+        
+    },
+    "DisabledByDefault": false,
+    "Main": "dev.zonary123.ZEconomy",
+    "IncludesAssetPack": true
+}
