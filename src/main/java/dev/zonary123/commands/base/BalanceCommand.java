@@ -11,6 +11,7 @@ import dev.zonary123.ZEconomy;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 
 import javax.annotation.Nonnull;
+import java.math.BigDecimal;
 import java.util.UUID;
 
 /**
@@ -36,60 +37,49 @@ public class BalanceCommand extends CommandBase {
       "The player to check the balance for.",
       ArgTypes.PLAYER_REF
     );
-
   }
 
 
-  @Override protected void executeSync(@NonNullDecl CommandContext context) {
+  @Override
+  protected void executeSync(@NonNullDecl CommandContext context) {
     String currency = this.currencyArg.get(context);
-
     PlayerRef playerRef = this.playerArg.get(context);
     if (currency == null) currency = "USD";
-    if (playerRef == null) {
-      showBalance(context, currency);
-    } else {
-      showBalance(context, playerRef, currency);
-    }
-  }
-
-  private void showBalance(CommandContext context, String currency) {
-    UUID playerUuid = context.sender().getUuid();
-    var plugin = ZEconomy.getInstance();
-    var database = plugin.getDatabase();
-    Account account = database.getCacheAccount(playerUuid);
-    if (account == null) {
-      context.sendMessage(
-        Message.raw(
-          "You do not have an account yet."
-        )
-      );
-      return;
-    }
-    context.sendMessage(
-      Message.raw(
-        "Your balance for " + currency + " is: " + account.getBalance(currency).toPlainString()
-      )
-    );
+    showBalance(context, playerRef, currency);
   }
 
   private void showBalance(CommandContext context, PlayerRef playerRef, String currency) {
-    var plugin = ZEconomy.getInstance();
-    var database = plugin.getDatabase();
-    Account account = database.getCacheAccount(playerRef.getUuid());
+    UUID playerUuid = playerRef == null
+      ? context.sender().getUuid()
+      : playerRef.getUuid();
+    showBalance(context, playerUuid, currency);
+  }
+
+  private void showBalance(CommandContext context, UUID playerUuid, String currency) {
+    var database = ZEconomy.getDatabase();
+    Account account = database.getAccount(playerUuid);
     if (account == null) {
       context.sendMessage(
         Message.raw(
-          "The player " + playerRef.getUsername() + " does not have an account yet."
+          "The player with UUID " + playerUuid + " does not have an account yet."
+        )
+      );
+      return;
+    }
+    BigDecimal bal = account.getBalance(currency);
+    if (bal == null) {
+      context.sendMessage(
+        Message.raw(
+          "The player with UUID " + playerUuid + " does not have a balance for " + currency + "."
         )
       );
       return;
     }
     context.sendMessage(
       Message.raw(
-        "The balance for " + playerRef.getUsername() + " in " + currency + " is: " + account.getBalance(currency).toPlainString()
+        "The balance for player with UUID " + playerUuid + " in " + currency + " is: " + bal.toPlainString()
       )
     );
   }
-
 
 }

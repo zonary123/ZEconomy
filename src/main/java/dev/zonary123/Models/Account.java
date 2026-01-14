@@ -8,16 +8,11 @@ import com.hypixel.hytale.codec.schema.SchemaContext;
 import com.hypixel.hytale.codec.schema.config.Schema;
 import com.hypixel.hytale.codec.schema.config.StringSchema;
 import com.hypixel.hytale.server.core.entity.entities.Player;
-import dev.zonary123.ZEconomy;
 import lombok.Data;
-import org.bson.BsonDocument;
-import org.bson.json.JsonWriterSettings;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 
-import java.io.IOException;
+import javax.annotation.Nullable;
 import java.math.BigDecimal;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -34,7 +29,9 @@ public class Account {
     .add()
     .append(
       new KeyedCodec<>("Balances", new Codec<>() {
-        @NonNullDecl @Override public Schema toSchema(@NonNullDecl SchemaContext schemaContext) {
+        @NonNullDecl
+        @Override
+        public Schema toSchema(@NonNullDecl SchemaContext schemaContext) {
           return new StringSchema();
         }
 
@@ -73,10 +70,12 @@ public class Account {
   public Account(Player player) {
     this.uuid = player.getUuid();
     this.username = player.getDisplayName();
+    this.dirty = true;
   }
 
+  @Nullable
   public synchronized BigDecimal getBalance(String currency) {
-    return balances.getOrDefault(currency, BigDecimal.ZERO);
+    return balances.getOrDefault(currency, null);
   }
 
   public synchronized void deposit(String currency, BigDecimal amount) {
@@ -95,27 +94,6 @@ public class Account {
   }
 
   public void save() {
-    try {
-      // Obtén la instancia del plugin y la carpeta de datos
-      var plugin = ZEconomy.getInstance();
-      Path folder = plugin.getDataDirectory().resolve("players");
 
-      // Asegúrate de que la carpeta exista
-      if (!Files.exists(folder)) {
-        Files.createDirectories(folder);
-      }
-
-      // Crea el path para guardar la cuenta, usando el UUID como nombre
-      Path file = folder.resolve(uuid.toString() + ".json");
-
-      // Serializa la account a BSON y luego a JSON
-      BsonDocument bson = CODEC.encode(this, ExtraInfo.THREAD_LOCAL.get());
-      String json = bson.toJson(JsonWriterSettings.builder().indent(true).build());
-
-      // Guarda el JSON en el archivo
-      Files.writeString(file, json);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
   }
 }
