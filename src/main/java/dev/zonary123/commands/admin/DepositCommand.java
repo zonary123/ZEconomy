@@ -6,6 +6,7 @@ import com.hypixel.hytale.server.core.command.system.arguments.system.RequiredAr
 import com.hypixel.hytale.server.core.command.system.arguments.types.ArgTypes;
 import com.hypixel.hytale.server.core.command.system.basecommands.CommandBase;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
+import dev.zonary123.Models.Currency;
 import dev.zonary123.api.ZEconomyApi;
 
 import javax.annotation.Nonnull;
@@ -53,13 +54,14 @@ public class DepositCommand extends CommandBase {
         )
       );
     }
-    result = ZEconomyApi.deposit(playerRef.getUuid(), currency, amount);
+    Currency curr = ZEconomyApi.getCurrency(currency);
+    result = ZEconomyApi.deposit(playerRef.getUuid(), curr.getId(), amount);
 
     if (result) {
       // Success
       context.sendMessage(
         Message.raw(
-          "Successfully deposited " + amount.toPlainString() + " " + currency + " to " +
+          "Successfully deposited " + amount.toPlainString() + " " + curr.getName() + " to " +
             playerRef.getUsername() + "."
         )
       );
@@ -67,7 +69,7 @@ public class DepositCommand extends CommandBase {
       // Failure
       context.sendMessage(
         Message.raw(
-          "Failed to deposit " + amount.toPlainString() + " " + currency + " to " +
+          "Failed to deposit " + amount.toPlainString() + " " + curr.getName() + " to " +
             playerRef.getUsername() + "."
         )
       );

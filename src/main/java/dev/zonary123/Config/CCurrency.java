@@ -15,6 +15,7 @@ public class CCurrency {
     "ZEM", new Currency("ZEM", "Zonary Economy Money", "$%.2f", 100.0, true),
     "GEM", new Currency("GEM", "Gonary Economy Money", "G$%.2f", 50.0, false)
   );
+  public static Currency PRIMARY_CURRENCY;
 
   public static void init() {
     CURRENCIES.clear();
@@ -28,6 +29,7 @@ public class CCurrency {
           Gson gson = Utils.GSON;
           try {
             Currency currency = gson.fromJson(Utils.readFileToString(file), Currency.class);
+            if (currency.isPrimary()) PRIMARY_CURRENCY = currency;
             CURRENCIES.put(currency.getId(), currency);
           } catch (Exception e) {
             e.printStackTrace();
@@ -51,12 +53,11 @@ public class CCurrency {
     for (var entry : map.entrySet()) {
       File file = currencyFile.resolve(entry.getKey() + ".json").toFile();
       try {
-        if (!file.exists()) {
-          file.createNewFile();
-        }
+        if (!file.exists()) file.createNewFile();
         Gson gson = Utils.GSON;
         String json = gson.toJson(entry.getValue());
         Files.writeString(file.toPath(), json);
+        if (entry.getValue().isPrimary()) PRIMARY_CURRENCY = entry.getValue();
         CURRENCIES.put(entry.getKey(), entry.getValue());
       } catch (Exception e) {
         e.printStackTrace();

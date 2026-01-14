@@ -7,6 +7,7 @@ import com.hypixel.hytale.server.core.command.system.arguments.types.ArgTypes;
 import com.hypixel.hytale.server.core.command.system.basecommands.CommandBase;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import dev.zonary123.Models.Account;
+import dev.zonary123.Models.Currency;
 import dev.zonary123.ZEconomy;
 import dev.zonary123.api.ZEconomyApi;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
@@ -67,18 +68,20 @@ public class BalanceCommand extends CommandBase {
       );
       return;
     }
-    BigDecimal bal = ZEconomyApi.getBalance(playerUuid, currency);
+    Currency curr = ZEconomyApi.getCurrency(currency);
+    BigDecimal bal = ZEconomyApi.getBalance(playerUuid, curr.getId());
     if (bal == null) {
       context.sendMessage(
         Message.raw(
-          "The player with UUID " + playerUuid + " does not have a balance for " + currency + "."
+          "The player with UUID " + playerUuid + " does not have a balance for " + curr.getName() + "."
         )
       );
       return;
     }
+
     context.sendMessage(
       Message.raw(
-        "The balance for player with UUID " + playerUuid + " in " + currency + " is: " + bal.toPlainString()
+        "The balance for player with UUID " + playerUuid + " in " + curr.getName() + " is: " + bal.toPlainString()
       )
     );
   }

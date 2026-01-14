@@ -1,6 +1,8 @@
 package dev.zonary123.api;
 
+import dev.zonary123.Config.CCurrency;
 import dev.zonary123.Models.Account;
+import dev.zonary123.Models.Currency;
 import dev.zonary123.ZEconomy;
 import dev.zonary123.database.DatabaseClient;
 
@@ -32,53 +34,66 @@ public class ZEconomyApi {
   /**
    * Get the balance of an account.
    *
-   * @param uuid     The UUID of the account.
-   * @param currency The currency to check the balance for.
+   * @param uuid       The UUID of the account.
+   * @param currencyId The currency to check the balance for.
    * @return The balance of the account.
    */
-  public static BigDecimal getBalance(UUID uuid, String currency) {
+  public static BigDecimal getBalance(UUID uuid, String currencyId) {
     DatabaseClient database = ZEconomy.getDatabase();
     Account account = database.getAccount(uuid);
+    Currency currency = getCurrency(currencyId);
     if (account == null) {
       account = database.findAccount(uuid);
       if (account == null) return BigDecimal.ZERO;
     }
-    return account.getBalance(currency);
+    return account.getBalance(currency.getId());
   }
 
   /**
    * Deposit an amount to an account.
    *
-   * @param uuid     The UUID of the account.
-   * @param currency The currency to deposit.
-   * @param amount   The amount to deposit.
+   * @param uuid       The UUID of the account.
+   * @param currencyId The currency to deposit.
+   * @param amount     The amount to deposit.
    * @return True if the deposit was successful, false otherwise.
    */
-  public static boolean deposit(UUID uuid, String currency, BigDecimal amount) {
+  public static boolean deposit(UUID uuid, String currencyId, BigDecimal amount) {
     DatabaseClient database = ZEconomy.getDatabase();
     Account account = database.getAccount(uuid);
+    Currency currency = getCurrency(currencyId);
     if (account == null) {
-      return database.deposit(uuid, currency, amount);
+      return database.deposit(uuid, currency.getId(), amount);
     } else {
-      return account.deposit(currency, amount);
+      return account.deposit(currency.getId(), amount);
     }
   }
 
   /**
    * Withdraw an amount from an account.
    *
-   * @param uuid     The UUID of the account.
-   * @param currency The currency to withdraw.
-   * @param amount   The amount to withdraw.
+   * @param uuid       The UUID of the account.
+   * @param currencyId The currency to withdraw.
+   * @param amount     The amount to withdraw.
    * @return True if the withdrawal was successful, false otherwise.
    */
-  public static boolean withdraw(UUID uuid, String currency, BigDecimal amount) {
+  public static boolean withdraw(UUID uuid, String currencyId, BigDecimal amount) {
     DatabaseClient database = ZEconomy.getDatabase();
     Account account = database.getAccount(uuid);
+    Currency currency = getCurrency(currencyId);
     if (account == null) {
-      return database.withdraw(uuid, currency, amount);
+      return database.withdraw(uuid, currency.getId(), amount);
     } else {
-      return account.withdraw(currency, amount);
+      return account.withdraw(currency.getId(), amount);
     }
+  }
+
+  /**
+   * Get a currency by its code.
+   *
+   * @param currencyId The code of the currency.
+   * @return The currency. If not exist returns the primary currency.
+   */
+  public static Currency getCurrency(String currencyId) {
+    return CCurrency.CURRENCIES.getOrDefault(currencyId, CCurrency.PRIMARY_CURRENCY);
   }
 }
