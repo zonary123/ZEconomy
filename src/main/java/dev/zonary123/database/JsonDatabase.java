@@ -7,6 +7,7 @@ import org.bson.BsonDocument;
 import org.bson.json.JsonWriterSettings;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.UUID;
@@ -64,5 +65,21 @@ public class JsonDatabase extends DatabaseClient {
       e.printStackTrace();
       return false;
     }
+  }
+
+  @Override
+  public boolean deposit(UUID uuid, String currency, BigDecimal amount) {
+    Account account = findAccount(uuid);
+    if (account == null) return false;
+    boolean result = account.deposit(currency, amount);
+    return result && saveOrUpdateAccount(account);
+  }
+
+  @Override
+  public boolean withdraw(UUID uuid, String currency, BigDecimal amount) {
+    Account account = findAccount(uuid);
+    if (account == null) return false;
+    boolean result = account.withdraw(currency, amount);
+    return result && saveOrUpdateAccount(account);
   }
 }

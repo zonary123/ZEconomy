@@ -7,6 +7,7 @@ build/
 
 ### Hytale ###
 run/
+libs/HytaleServer.jar
 
 ### IntelliJ IDEA ###
 .idea/

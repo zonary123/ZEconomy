@@ -43,5 +43,23 @@ public abstract class DatabaseClient {
    */
   public abstract boolean saveOrUpdateAccount(Account account);
 
+  /**
+   * Deposit an amount to an account.
+   *
+   * @param uuid     The UUID of the account.
+   * @param currency The currency to deposit.
+   * @param amount   The amount to deposit.
+   * @return True if the deposit was successful, false otherwise.
+   */
   public abstract boolean deposit(UUID uuid, String currency, BigDecimal amount);
+
+  /**
+   * Withdraw an amount from an account.
+   *
+   * @param uuid     The UUID of the account.
+   * @param currency The currency to withdraw.
+   * @param amount   The amount to withdraw.
+   * @return True if the withdrawal was successful, false otherwise.
+   */
+  public abstract boolean withdraw(UUID uuid, String currency, BigDecimal amount);
 }
