@@ -78,8 +78,9 @@ public class Account {
     return balances.getOrDefault(currency, null);
   }
 
-  public synchronized void deposit(String currency, BigDecimal amount) {
+  public synchronized boolean deposit(String currency, BigDecimal amount) {
     balances.merge(currency, amount, BigDecimal::add);
+    return true;
   }
 
   public synchronized boolean withdraw(String currency, BigDecimal amount) {

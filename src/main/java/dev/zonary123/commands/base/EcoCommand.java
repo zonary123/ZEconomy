@@ -10,6 +10,7 @@ public class EcoCommand extends CommandBase {
 
   public EcoCommand(@Nonnull String name, @Nonnull String description) {
     super(name, description);
+    this.requirePermission("zeconomy.command.eco");
     this.addSubCommand(Commands.BALANCE_COMMAND);
     this.addSubCommand(Commands.DEPOSIT_COMMAND);
   }

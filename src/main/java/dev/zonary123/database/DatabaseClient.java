@@ -3,6 +3,7 @@ package dev.zonary123.database;
 import dev.zonary123.Models.Account;
 
 import javax.annotation.Nullable;
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -41,4 +42,6 @@ public abstract class DatabaseClient {
    * @return True if the account was saved or updated, false otherwise.
    */
   public abstract boolean saveOrUpdateAccount(Account account);
+
+  public abstract boolean deposit(UUID uuid, String currency, BigDecimal amount);
 }
