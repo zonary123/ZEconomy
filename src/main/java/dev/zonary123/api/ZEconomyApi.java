@@ -96,4 +96,14 @@ public class ZEconomyApi {
   public static Currency getCurrency(String currencyId) {
     return CCurrency.CURRENCIES.getOrDefault(currencyId, CCurrency.PRIMARY_CURRENCY);
   }
+
+  /**
+   * Check if a currency exists.
+   *
+   * @param currencyId The code of the currency.
+   * @return True if the currency exists, false otherwise.
+   */
+  public boolean existsCurrency(String currencyId) {
+    return CCurrency.CURRENCIES.containsKey(currencyId);
+  }
 }
