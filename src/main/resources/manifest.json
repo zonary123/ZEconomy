@@ -13,10 +13,10 @@
     "Website": "https://your-plugin-website.com",
     "ServerVersion": "*",
     "Dependencies": {
-
+        
     },
     "OptionalDependencies": {
-
+        
     },
     "DisabledByDefault": false,
     "Main": "dev.zonary123.ZEconomy",

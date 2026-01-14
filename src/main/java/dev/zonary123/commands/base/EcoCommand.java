@@ -13,6 +13,7 @@ public class EcoCommand extends CommandBase {
     this.requirePermission("zeconomy.command.eco");
     this.addSubCommand(Commands.BALANCE_COMMAND);
     this.addSubCommand(Commands.DEPOSIT_COMMAND);
+    this.addSubCommand(Commands.WITHDRAW_COMMAND);
   }
 
   @Override

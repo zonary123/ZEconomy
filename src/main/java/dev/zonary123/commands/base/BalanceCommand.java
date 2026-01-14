@@ -8,6 +8,7 @@ import com.hypixel.hytale.server.core.command.system.basecommands.CommandBase;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import dev.zonary123.Models.Account;
 import dev.zonary123.ZEconomy;
+import dev.zonary123.api.ZEconomyApi;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 
 import javax.annotation.Nonnull;
@@ -66,7 +67,7 @@ public class BalanceCommand extends CommandBase {
       );
       return;
     }
-    BigDecimal bal = account.getBalance(currency);
+    BigDecimal bal = ZEconomyApi.getBalance(playerUuid, currency);
     if (bal == null) {
       context.sendMessage(
         Message.raw(

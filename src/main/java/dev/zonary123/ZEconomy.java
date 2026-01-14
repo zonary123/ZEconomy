@@ -4,6 +4,7 @@ import com.hypixel.hytale.server.core.event.events.player.PlayerReadyEvent;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import com.hypixel.hytale.server.core.util.Config;
+import dev.zonary123.Config.CCurrency;
 import dev.zonary123.Config.ZEConfig;
 import dev.zonary123.commands.Commands;
 import dev.zonary123.database.DatabaseClient;
@@ -30,10 +31,16 @@ public class ZEconomy extends JavaPlugin {
   @Override
   protected void setup() {
     super.setup();
-    this.config.save();
+    files();
     Commands.register(this);
     this.getEventRegistry().registerGlobal(PlayerReadyEvent.class, JoinPlayerEvent::onPlayerReady);
     this.database = DatabaseFactory.createDatabaseClient();
+  }
+
+  private void files() {
+    this.config.load();
+    this.config.save();
+    CCurrency.init();
   }
 
   @Override

@@ -6,9 +6,7 @@ import com.hypixel.hytale.server.core.command.system.arguments.system.RequiredAr
 import com.hypixel.hytale.server.core.command.system.arguments.types.ArgTypes;
 import com.hypixel.hytale.server.core.command.system.basecommands.CommandBase;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
-import dev.zonary123.Models.Account;
-import dev.zonary123.ZEconomy;
-import dev.zonary123.database.DatabaseClient;
+import dev.zonary123.api.ZEconomyApi;
 
 import javax.annotation.Nonnull;
 import java.math.BigDecimal;
@@ -46,8 +44,6 @@ public class WithdrawCommand extends CommandBase {
     String currency = this.currencyArg.get(context);
     PlayerRef playerRef = this.playerArg.get(context);
     String amountStr = this.amountArg.get(context);
-    DatabaseClient database = ZEconomy.getDatabase();
-    Account account = database.getAccount(playerRef.getUuid());
     BigDecimal amount = new BigDecimal(amountStr);
     boolean result = amount.compareTo(BigDecimal.ZERO) > 0;
     if (!result) {
@@ -57,18 +53,13 @@ public class WithdrawCommand extends CommandBase {
         )
       );
     }
-    if (account == null) {
-      // Player disconnected or does not exist
-      result = database.withdraw(playerRef.getUuid(), currency, amount);
-    } else {
-      result = account.withdraw(currency, amount);
-    }
+    result = ZEconomyApi.withdraw(playerRef.getUuid(), currency, amount);
     // Respond to sender
     if (result) {
       // Success
       context.sendMessage(
         Message.raw(
-          "Successfully deposited " + amount.toPlainString() + " " + currency + " to " +
+          "Successfully withdraw " + amount.toPlainString() + " " + currency + " to " +
             playerRef.getUsername() + "."
         )
       );
@@ -76,7 +67,7 @@ public class WithdrawCommand extends CommandBase {
       // Failure
       context.sendMessage(
         Message.raw(
-          "Failed to deposit " + amount.toPlainString() + " " + currency + " to " +
+          "Failed to withdraw " + amount.toPlainString() + " " + currency + " to " +
             playerRef.getUsername() + "."
         )
       );
