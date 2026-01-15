@@ -8,57 +8,90 @@ import dev.zonary123.utils.Utils;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.Map;
 
 public class CCurrency {
-  public static final Map<String, Currency> CURRENCIES = Map.of(
-    "ZEM", new Currency("ZEM", "Zonary Economy Money", "$%.2f", 100.0, true),
-    "GEM", new Currency("GEM", "Gonary Economy Money", "G$%.2f", 50.0, false)
-  );
+
+  public static final Map<String, Currency> CURRENCIES = new HashMap<>();
   public static Currency PRIMARY_CURRENCY;
 
   public static void init() {
     CURRENCIES.clear();
-    Path currencyFile = ZEconomy.getInstance().getFile().resolve("currencies");
-    if (!currencyFile.toFile().exists()) {
-      createDefault();
-    } else {
-      var files = currencyFile.toFile().listFiles();
-      if (files != null) {
-        for (File file : files) {
-          Gson gson = Utils.GSON;
-          try {
-            Currency currency = gson.fromJson(Utils.readFileToString(file), Currency.class);
-            if (currency.isPrimary()) PRIMARY_CURRENCY = currency;
-            CURRENCIES.put(currency.getId(), currency);
-          } catch (Exception e) {
-            e.printStackTrace();
+    PRIMARY_CURRENCY = null;
 
-          }
+    Path currencyDir = ZEconomy.getInstance().getDataDirectory().resolve("currencies");
+
+    ZEconomy.getInstance().getLogger().atInfo().log(
+      "[CCurrency] Loading currencies from: " + currencyDir.toAbsolutePath()
+    );
+
+    if (!Files.exists(currencyDir)) {
+      createDefault(currencyDir);
+      return;
+    }
+
+    File[] files = currencyDir.toFile().listFiles((dir, name) -> name.endsWith(".json"));
+    if (files == null || files.length == 0) {
+      createDefault(currencyDir);
+      return;
+    }
+
+    Gson gson = Utils.GSON;
+
+    for (File file : files) {
+      try {
+        Currency currency = gson.fromJson(
+          Files.readString(file.toPath()),
+          Currency.class
+        );
+        String id = file.getName().replace(".json", "");
+        if (currency == null) continue;
+        if (currency.getId() == null) currency.setId(id);
+
+        CURRENCIES.put(currency.getId(), currency);
+
+        if (currency.isPrimary()) {
+          PRIMARY_CURRENCY = currency;
         }
+
+      } catch (Exception e) {
+        e.printStackTrace();
       }
+    }
+
+    // Fallback si ninguna es primaria
+    if (PRIMARY_CURRENCY == null && !CURRENCIES.isEmpty()) {
+      PRIMARY_CURRENCY = CURRENCIES.values().iterator().next();
     }
   }
 
-  private static void createDefault() {
-    var map = Map.of(
-      "ZEM", new Currency("coins", "Coins", "Coins %amount%", 100.0, true),
-      "GEM", new Currency("gems", "Gems", "Gems %amount%", 50.0, false)
-    );
-    Path currencyFile = ZEconomy.getInstance().getFile().resolve("currencies");
-    if (!currencyFile.toFile().exists()) {
-      currencyFile.toFile().mkdirs();
+  private static void createDefault(Path currencyDir) {
+    try {
+      Files.createDirectories(currencyDir);
+    } catch (Exception e) {
+      e.printStackTrace();
+      return;
     }
 
-    for (var entry : map.entrySet()) {
-      File file = currencyFile.resolve(entry.getKey() + ".json").toFile();
+    Map<String, Currency> defaults = Map.of(
+      "coins", new Currency("coins", "Coins", "Coins %amount%", 100.0, true),
+      "gems", new Currency("gems", "Gems", "Gems %amount%", 50.0, false)
+    );
+
+    Gson gson = Utils.GSON;
+
+    for (Currency currency : defaults.values()) {
+      File file = currencyDir.resolve(currency.getId() + ".json").toFile();
+
       try {
-        if (!file.exists()) file.createNewFile();
-        Gson gson = Utils.GSON;
-        String json = gson.toJson(entry.getValue());
-        Files.writeString(file.toPath(), json);
-        if (entry.getValue().isPrimary()) PRIMARY_CURRENCY = entry.getValue();
-        CURRENCIES.put(entry.getKey(), entry.getValue());
+        Files.writeString(file.toPath(), gson.toJson(currency));
+        CURRENCIES.put(currency.getId(), currency);
+
+        if (currency.isPrimary()) {
+          PRIMARY_CURRENCY = currency;
+        }
+
       } catch (Exception e) {
         e.printStackTrace();
       }

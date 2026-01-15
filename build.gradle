@@ -33,9 +33,8 @@ dependencies {
   testAnnotationProcessor("org.projectlombok:lombok:1.18.42")
 
   implementation("com.github.ben-manes.caffeine:caffeine:3.2.3")
-
-  implementation(fileTree(dir:"libs", include:["*.jar"]))
-  //implementation(files("$hytaleHome/install/$patchline/package/game/latest/Server/HytaleServer.jar"))
+  
+  implementation(files("$hytaleHome/install/$patchline/package/game/latest/Server/HytaleServer.jar"))
 }
 
 // Create the working directory to run the server if it does not already exist.

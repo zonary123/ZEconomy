@@ -8,6 +8,8 @@ import com.hypixel.hytale.codec.schema.SchemaContext;
 import com.hypixel.hytale.codec.schema.config.Schema;
 import com.hypixel.hytale.codec.schema.config.StringSchema;
 import com.hypixel.hytale.server.core.entity.entities.Player;
+import dev.zonary123.ZEconomy;
+import dev.zonary123.api.ZEconomyApi;
 import lombok.Data;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 
@@ -80,6 +82,7 @@ public class Account {
 
   public synchronized boolean deposit(String currency, BigDecimal amount) {
     balances.merge(currency, amount, BigDecimal::add);
+    dirty = true;
     return true;
   }
 
@@ -87,14 +90,22 @@ public class Account {
     BigDecimal current = balances.getOrDefault(currency, BigDecimal.ZERO);
     if (current.compareTo(amount) < 0) return false;
     balances.put(currency, current.subtract(amount));
+    dirty = true;
     return true;
   }
 
   public void fix() {
-    balances.put("USD", BigDecimal.valueOf(1000));
+    var currencies = ZEconomyApi.getCurrencies();
+    var entries = currencies.entrySet();
+    for (Map.Entry<String, Currency> entry : entries) {
+      String currencyId = entry.getKey();
+      Currency currency = entry.getValue();
+      balances.putIfAbsent(currencyId, BigDecimal.valueOf(currency.getDefaultBalance()));
+    }
   }
 
   public void save() {
-
+    if (!this.dirty) return;
+    ZEconomy.getDatabase().saveOrUpdateAccount(this);
   }
 }

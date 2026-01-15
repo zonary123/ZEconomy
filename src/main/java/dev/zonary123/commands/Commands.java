@@ -6,16 +6,32 @@ import dev.zonary123.commands.admin.DepositCommand;
 import dev.zonary123.commands.admin.WithdrawCommand;
 import dev.zonary123.commands.base.BalanceCommand;
 import dev.zonary123.commands.base.EcoCommand;
+import lombok.Data;
 
+@Data
 public class Commands {
-  public final static CommandBase ECO_COMMAND = new EcoCommand("eco", "Base economy command");
-  public final static CommandBase BALANCE_COMMAND = new BalanceCommand("bal", "Check your balance");
-  public final static CommandBase DEPOSIT_COMMAND = new DepositCommand("deposit", "Deposit money to your account");
-  public final static CommandBase WITHDRAW_COMMAND = new WithdrawCommand("withdraw", "Withdraw money from your account");
+  public Commands() {
 
+  }
 
-  public static void register(JavaPlugin plugin) {
-    plugin.getCommandRegistry().registerCommand(ECO_COMMAND);
-    plugin.getCommandRegistry().registerCommand(BALANCE_COMMAND);
+  public void register(JavaPlugin plugin) {
+    plugin.getCommandRegistry().registerCommand(createEcoCommand());
+    plugin.getCommandRegistry().registerCommand(createBalanceCommand());
+  }
+
+  public static CommandBase createEcoCommand() {
+    return new EcoCommand("eco", "Base economy command");
+  }
+
+  public static CommandBase createBalanceCommand() {
+    return new BalanceCommand("bal", "Check your balance");
+  }
+
+  public static CommandBase createDepositCommand() {
+    return new DepositCommand("deposit", "Deposit money to a player");
+  }
+
+  public static CommandBase createWithdrawCommand() {
+    return new WithdrawCommand("withdraw", "Withdraw money from a player");
   }
 }

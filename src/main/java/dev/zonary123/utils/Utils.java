@@ -7,7 +7,10 @@ import java.io.File;
 import java.io.FileReader;
 
 public abstract class Utils {
-  public static final Gson GSON = new Gson();
+  public static final Gson GSON = new Gson()
+    .newBuilder()
+    .setPrettyPrinting()
+    .create();
 
   public static String readFileToString(File file) {
     StringBuilder contentBuilder = new StringBuilder();

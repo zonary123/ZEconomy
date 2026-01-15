@@ -15,7 +15,7 @@ import lombok.Setter;
 public class ZEConfig {
   public static final BuilderCodec<ZEConfig> CODEC = BuilderCodec.builder(ZEConfig.class, ZEConfig::new)
     .append(
-      new KeyedCodec<Boolean>("Debug", Codec.BOOLEAN),
+      new KeyedCodec<>("Debug", Codec.BOOLEAN),
       ZEConfig::setDebug, ZEConfig::isDebug
     )
     .add()

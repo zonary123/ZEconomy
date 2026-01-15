@@ -5,7 +5,9 @@ import com.hypixel.hytale.server.core.command.system.CommandContext;
 import com.hypixel.hytale.server.core.command.system.arguments.system.RequiredArg;
 import com.hypixel.hytale.server.core.command.system.arguments.types.ArgTypes;
 import com.hypixel.hytale.server.core.command.system.basecommands.CommandBase;
+import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
+import com.hypixel.hytale.server.core.util.NotificationUtil;
 import dev.zonary123.Models.Currency;
 import dev.zonary123.api.ZEconomyApi;
 
@@ -64,6 +66,16 @@ public class DepositCommand extends CommandBase {
           "Successfully deposited " + amount.toPlainString() + " " + curr.getName() + " to " +
             playerRef.getUsername() + "."
         )
+      );
+      var packetHandler = playerRef.getPacketHandler();
+      NotificationUtil.sendNotification(
+        packetHandler,
+        Message.raw("Deposit"),
+        Message.raw(
+          "An administrator has deposited " + amount.toPlainString() + " " + curr.getName() +
+            " to your account."
+        ),
+        new ItemStack("Ingredient_Bar_Gold", 1).toPacket()
       );
     } else {
       // Failure
