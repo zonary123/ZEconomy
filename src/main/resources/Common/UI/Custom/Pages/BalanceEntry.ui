@@ -1,0 +1,23 @@
+Group {
+  Anchor: (Height: 36, Bottom: 4);
+  LayoutMode: Top;
+  Background: (Color: #000000(0.4));
+  Padding: (Full: 4);
+
+  Group{
+    LayoutMode: Left;
+    Anchor: (Height: 14);
+
+    Label #CurrencyName {
+      Text: "Currency";
+      Style: (FontSize: 16, TextColor: #ffffff, RenderBold: true);
+      Anchor: (Height: 14, Top: 2);
+    }
+
+    Label #CurrencyAmount {
+      Text: "0.00";
+      Style: (FontSize: 16, TextColor: #ffffff, RenderBold: true);
+      Anchor: (Height: 14, Top: 3);
+    }
+  }
+}

@@ -33,7 +33,7 @@ dependencies {
   testAnnotationProcessor("org.projectlombok:lombok:1.18.42")
 
   implementation("com.github.ben-manes.caffeine:caffeine:3.2.3")
-  
+
   implementation(files("$hytaleHome/install/$patchline/package/game/latest/Server/HytaleServer.jar"))
 }
 

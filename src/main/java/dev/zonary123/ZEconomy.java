@@ -10,9 +10,9 @@ import dev.zonary123.Config.ZEConfig;
 import dev.zonary123.commands.Commands;
 import dev.zonary123.database.DatabaseClient;
 import dev.zonary123.database.DatabaseFactory;
-import dev.zonary123.database.JsonDatabase;
 import dev.zonary123.events.DisconnectPlayerEvent;
 import dev.zonary123.events.JoinPlayerEvent;
+import dev.zonary123.systems.BalanceHudTickingSystem;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -24,7 +24,7 @@ public class ZEconomy extends JavaPlugin {
   private static ZEconomy INSTANCE;
 
   private Commands commands = new Commands();
-  private DatabaseClient database = new JsonDatabase();
+  private DatabaseClient database;
   private final Config<ZEConfig> config;
 
   public ZEconomy(@Nonnull JavaPluginInit init) {
@@ -37,6 +37,7 @@ public class ZEconomy extends JavaPlugin {
   protected void setup() {
     super.setup();
     files();
+    DatabaseFactory.createDatabaseClient();
     commands.register(this);
     events();
     this.database = DatabaseFactory.createDatabaseClient();
@@ -52,19 +53,17 @@ public class ZEconomy extends JavaPlugin {
   private void events() {
     this.getEventRegistry().registerGlobal(PlayerReadyEvent.class, JoinPlayerEvent::onPlayerReady);
     this.getEventRegistry().registerGlobal(PlayerDisconnectEvent.class, DisconnectPlayerEvent::onPlayerDisconnect);
+    this.getEntityStoreRegistry().registerSystem(new BalanceHudTickingSystem());
   }
 
-  @Override
-  protected void shutdown() {
-    super.shutdown();
-  }
 
-  public static ZEconomy getInstance() {
+  public static ZEconomy get() {
     return INSTANCE;
   }
 
   public static DatabaseClient getDatabase() {
-    return getInstance().database;
+    return get().database;
   }
+
 }
 

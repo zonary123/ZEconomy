@@ -91,6 +91,7 @@ public class BalanceCommand extends CommandBase {
       );
       return;
     }
+    
     if (context.isPlayer()) playerRef = context.senderAs(Player.class).getPlayerRef();
 
     if (playerRef != null) {

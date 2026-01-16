@@ -7,15 +7,18 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.schema.SchemaContext;
 import com.hypixel.hytale.codec.schema.config.Schema;
 import com.hypixel.hytale.codec.schema.config.StringSchema;
-import com.hypixel.hytale.server.core.entity.entities.Player;
+import com.hypixel.hytale.server.core.universe.PlayerRef;
 import dev.zonary123.ZEconomy;
 import dev.zonary123.api.ZEconomyApi;
+import dev.zonary123.ui.BalUI;
 import lombok.Data;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 
 import javax.annotation.Nullable;
 import java.math.BigDecimal;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -64,14 +67,16 @@ public class Account {
   private UUID uuid;
   private String username;
   private final Map<String, BigDecimal> balances = new ConcurrentHashMap<>();
+  private transient BalUI balUI;
   private transient boolean dirty = false;
 
   public Account() {
+
   }
 
-  public Account(Player player) {
-    this.uuid = player.getUuid();
-    this.username = player.getDisplayName();
+  public Account(PlayerRef playerRef) {
+    this.uuid = playerRef.getUuid();
+    this.username = playerRef.getUsername();
     this.dirty = true;
   }
 
@@ -96,13 +101,25 @@ public class Account {
 
   public void fix() {
     var currencies = ZEconomyApi.getCurrencies();
-    var entries = currencies.entrySet();
-    for (Map.Entry<String, Currency> entry : entries) {
+    Set<String> keys = new HashSet<>(balances.keySet()); // COPIA
+
+    for (Map.Entry<String, Currency> entry : currencies.entrySet()) {
       String currencyId = entry.getKey();
       Currency currency = entry.getValue();
-      balances.putIfAbsent(currencyId, BigDecimal.valueOf(currency.getDefaultBalance()));
+
+      balances.putIfAbsent(
+        currencyId,
+        BigDecimal.valueOf(currency.getDefaultBalance())
+      );
+
+      keys.remove(currencyId);
+    }
+
+    for (String key : keys) {
+      balances.remove(key);
     }
   }
+
 
   public void save() {
     if (!this.dirty) return;

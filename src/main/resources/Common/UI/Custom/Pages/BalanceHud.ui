@@ -1,0 +1,21 @@
+Group #BalanceHudContainer {
+  Anchor: (Width: 150, Top: 10, Left: 10, Right: 10);
+  LayoutMode: Right;
+  Visible: true;
+
+  Group #BalanceHud {
+    Padding: (Full: 4);
+    Anchor: (Width: 150, Top: 6, Height: 140);
+    LayoutMode: Top;
+
+    Label #BalaceTitle {
+      Text: "Balances";
+      Style: (FontSize: 12, TextColor: #ccb588, RenderUppercase: true, RenderBold: true);
+      Anchor: (Height: 18, Bottom: 4);
+    }
+
+    Group #CurrenciesList {
+      LayoutMode: Top;
+    }
+  }
+}

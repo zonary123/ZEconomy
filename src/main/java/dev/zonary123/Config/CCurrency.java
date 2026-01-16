@@ -8,21 +8,23 @@ import dev.zonary123.utils.Utils;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class CCurrency {
 
-  public static final Map<String, Currency> CURRENCIES = new HashMap<>();
+  public static final Map<String, Currency> CURRENCIES = new LinkedHashMap<>();
   public static Currency PRIMARY_CURRENCY;
 
   public static void init() {
     CURRENCIES.clear();
     PRIMARY_CURRENCY = null;
 
-    Path currencyDir = ZEconomy.getInstance().getDataDirectory().resolve("currencies");
+    Path currencyDir = ZEconomy.get().getDataDirectory().resolve("currencies");
 
-    ZEconomy.getInstance().getLogger().atInfo().log(
+    ZEconomy.get().getLogger().atInfo().log(
       "[CCurrency] Loading currencies from: " + currencyDir.toAbsolutePath()
     );
 
@@ -49,6 +51,7 @@ public class CCurrency {
         if (currency == null) continue;
         if (currency.getId() == null) currency.setId(id);
 
+        Files.writeString(file.toPath(), gson.toJson(currency));
         CURRENCIES.put(currency.getId(), currency);
 
         if (currency.isPrimary()) {
@@ -61,9 +64,22 @@ public class CCurrency {
     }
 
     // Fallback si ninguna es primaria
-    if (PRIMARY_CURRENCY == null && !CURRENCIES.isEmpty()) {
-      PRIMARY_CURRENCY = CURRENCIES.values().iterator().next();
-    }
+    if (PRIMARY_CURRENCY == null && !CURRENCIES.isEmpty()) PRIMARY_CURRENCY = CURRENCIES.values().iterator().next();
+    Map<String, Currency> sorted = CURRENCIES.entrySet()
+      .stream()
+      .sorted(Map.Entry.comparingByValue(
+        Comparator.comparingInt(Currency::getSort)
+      ))
+      .collect(Collectors.toMap(
+        Map.Entry::getKey,
+        Map.Entry::getValue,
+        (a, b) -> a,
+        LinkedHashMap::new
+      ));
+
+    CURRENCIES.clear();
+    CURRENCIES.putAll(sorted);
+
   }
 
   private static void createDefault(Path currencyDir) {
