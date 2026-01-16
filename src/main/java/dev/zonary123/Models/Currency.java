@@ -75,7 +75,6 @@ public class Currency {
   private String apply(String v) {
     String f = format;
     if (f == null) return v;
-
     int i = f.indexOf("%s");
     return i < 0 ? v : f.substring(0, i) + v + f.substring(i + 3);
   }
