@@ -9,11 +9,14 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class CCurrency {
-  public static final Map<String, Currency> CURRENCIES = Map.of(
-    "ZEM", new Currency("ZEM", "Zonary Economy Money", "$%.2f", 100.0, true),
-    "GEM", new Currency("GEM", "Gonary Economy Money", "G$%.2f", 50.0, false)
+  public static final Map<String, Currency> CURRENCIES = new ConcurrentHashMap<>(
+    Map.of(
+      "ZEM", new Currency("ZEM", "Zonary Economy Money", "$%.2f", 100.0, true),
+      "GEM", new Currency("GEM", "Gonary Economy Money", "G$%.2f", 50.0, false)
+    )
   );
   public static Currency PRIMARY_CURRENCY;
 

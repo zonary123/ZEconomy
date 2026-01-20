@@ -8,13 +8,17 @@ import dev.zonary123.commands.base.BalanceCommand;
 import dev.zonary123.commands.base.EcoCommand;
 
 public class Commands {
-  public final static CommandBase ECO_COMMAND = new EcoCommand("eco", "Base economy command");
-  public final static CommandBase BALANCE_COMMAND = new BalanceCommand("bal", "Check your balance");
-  public final static CommandBase DEPOSIT_COMMAND = new DepositCommand("deposit", "Deposit money to your account");
-  public final static CommandBase WITHDRAW_COMMAND = new WithdrawCommand("withdraw", "Withdraw money from your account");
+  public static CommandBase ECO_COMMAND;
+  public static CommandBase BALANCE_COMMAND;
+  public static CommandBase DEPOSIT_COMMAND;
+  public static CommandBase WITHDRAW_COMMAND;
 
 
   public static void register(JavaPlugin plugin) {
+    ECO_COMMAND = new EcoCommand("eco", "Base economy command");
+    BALANCE_COMMAND = new BalanceCommand("bal", "Check your balance");
+    DEPOSIT_COMMAND = new DepositCommand("deposit", "Deposit money to your account");
+    WITHDRAW_COMMAND = new WithdrawCommand("withdraw", "Withdraw money from your account");
     plugin.getCommandRegistry().registerCommand(ECO_COMMAND);
     plugin.getCommandRegistry().registerCommand(BALANCE_COMMAND);
   }

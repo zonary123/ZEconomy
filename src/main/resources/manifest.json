@@ -16,7 +16,7 @@
         
     },
     "OptionalDependencies": {
-        
+        "com.dunystudios.hytale.plugins:EcoAPI": "*"
     },
     "DisabledByDefault": false,
     "Main": "dev.zonary123.ZEconomy",
