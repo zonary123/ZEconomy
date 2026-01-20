@@ -37,7 +37,10 @@ dependencies {
 
   implementation("org.mongodb:mongodb-driver-sync:5.6.2")
 
-  implementation(files("$hytaleHome/install/$patchline/package/game/latest/Server/HytaleServer.jar"))
+  implementation(fileTree(
+    dir: "libs", includes: ["*.jar"]
+  ))
+  //implementation(files("$hytaleHome/install/$patchline/package/game/latest/Server/HytaleServer.jar"))
 }
 
 // Create the working directory to run the server if it does not already exist.

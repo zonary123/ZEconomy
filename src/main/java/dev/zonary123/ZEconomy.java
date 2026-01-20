@@ -1,5 +1,8 @@
 package dev.zonary123;
 
+import com.dunystudios.hytale.plugins.IEcoAPI;
+import com.hypixel.hytale.common.plugin.PluginIdentifier;
+import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.server.core.event.events.player.PlayerDisconnectEvent;
 import com.hypixel.hytale.server.core.event.events.player.PlayerReadyEvent;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
@@ -13,6 +16,7 @@ import dev.zonary123.database.DatabaseFactory;
 import dev.zonary123.events.DisconnectPlayerEvent;
 import dev.zonary123.events.JoinPlayerEvent;
 import dev.zonary123.systems.BalanceHudTickingSystem;
+import dev.zonary123.utils.IEcoOverwrite;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -41,6 +45,14 @@ public class ZEconomy extends JavaPlugin {
     commands.register(this);
     events();
     this.database = DatabaseFactory.createDatabaseClient();
+
+    var plugin = HytaleServer.get().getPluginManager().getPlugin(new PluginIdentifier("com.dunystudios.hytale.plugins", "EcoAPI"));
+    if (plugin != null && plugin.isEnabled()) {
+      IEcoAPI.Service.setInstance(new IEcoOverwrite());
+      getLogger().atInfo().log(
+        "EcoAPI plugin detected, overwriting with ZEconomy implementation."
+      );
+    }
   }
 
 
