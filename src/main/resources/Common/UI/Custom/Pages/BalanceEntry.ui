@@ -1,7 +1,9 @@
+$C = "../Common.ui";
+
 Group {
   Anchor: (Height: 36, Bottom: 6);
   LayoutMode: Top;
-  Background: (TexturePath: "Sprite-0001.png");
+  Background: $C.@InputBoxBackground;
   Padding: (Full: 8);
 
   Group{

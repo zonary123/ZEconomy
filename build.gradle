@@ -8,10 +8,15 @@ ext {
 }
 
 java {
-  toolchain.languageVersion = JavaLanguageVersion.of(java_version)
+  toolchain {
+    languageVersion.set(JavaLanguageVersion.of(25))
+    vendor.set(JvmVendorSpec.ADOPTIUM)
+  }
+
   withSourcesJar()
   withJavadocJar()
 }
+
 
 // Quiet warnings about missing Javadocs.
 javadoc {
@@ -20,6 +25,10 @@ javadoc {
 
 repositories {
   mavenCentral()
+  maven {
+    name "hMReleases"
+    url "https://maven.hytale-modding.info/releases"
+  }
 }
 
 // Adds the Hytale server as a build dependency, allowing you to reference and
@@ -32,11 +41,10 @@ dependencies {
   testCompileOnly("org.projectlombok:lombok:1.18.42")
   testAnnotationProcessor("org.projectlombok:lombok:1.18.42")
 
-  implementation("com.github.ben-manes.caffeine:caffeine:3.2.3")
-  implementation("com.zaxxer:HikariCP:2.3.2")
+  implementation "com.buuz135:MultipleHUD:1.0.1"
 
-  implementation("org.mongodb:mongodb-driver-sync:5.6.2")
-
+  compileOnly fileTree(dir: 'libs', include: ['*.jar'])
+  runtimeOnly fileTree(dir: 'libs', include: ['*.jar'])
   implementation(files("$hytaleHome/install/$patchline/package/game/latest/Server/HytaleServer.jar"))
 }
 

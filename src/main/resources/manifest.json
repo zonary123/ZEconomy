@@ -19,6 +19,6 @@
         
     },
     "DisabledByDefault": false,
-    "Main": "dev.zonary123.ZEconomy",
+    "Main": "dev.zonary123.zeconomy.ZEconomy",
     "IncludesAssetPack": true
 }
