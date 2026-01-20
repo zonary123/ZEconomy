@@ -1,41 +1,35 @@
-package dev.zonary123.zeconomy;
+package dev.zonary123;
 
-import com.hypixel.hytale.logger.HytaleLogger;
+import com.dunystudios.hytale.plugins.IEcoAPI;
+import com.hypixel.hytale.common.plugin.PluginIdentifier;
+import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.server.core.event.events.player.PlayerDisconnectEvent;
 import com.hypixel.hytale.server.core.event.events.player.PlayerReadyEvent;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import com.hypixel.hytale.server.core.util.Config;
-import dev.zonary123.zeconomy.Config.CCurrency;
-import dev.zonary123.zeconomy.Config.ZEConfig;
-import dev.zonary123.zeconomy.commands.Commands;
-import dev.zonary123.zeconomy.database.DatabaseClient;
-import dev.zonary123.zeconomy.database.DatabaseFactory;
-import dev.zonary123.zeconomy.events.DisconnectPlayerEvent;
-import dev.zonary123.zeconomy.events.JoinPlayerEvent;
-import dev.zonary123.zeconomy.systems.BalanceHudTickingSystem;
-import dev.zonary123.zeconomy.tasks.Tasks;
+import dev.zonary123.Config.CCurrency;
+import dev.zonary123.Config.ZEConfig;
+import dev.zonary123.commands.Commands;
+import dev.zonary123.database.DatabaseClient;
+import dev.zonary123.database.DatabaseFactory;
+import dev.zonary123.events.DisconnectPlayerEvent;
+import dev.zonary123.events.JoinPlayerEvent;
+import dev.zonary123.systems.BalanceHudTickingSystem;
+import dev.zonary123.utils.IEcoOverwrite;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.annotation.Nonnull;
-import java.nio.file.Path;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 
 @Getter
 @Setter
 public class ZEconomy extends JavaPlugin {
   private static ZEconomy INSTANCE;
+
   private Commands commands = new Commands();
   private DatabaseClient database;
   private final Config<ZEConfig> config;
-
-
-  public static final ScheduledExecutorService SCHEDULED_EXECUTOR_SERVICE =
-    Executors.newSingleThreadScheduledExecutor(
-      r -> new Thread(r, "ZEconomy-Scheduler")
-    );
 
   public ZEconomy(@Nonnull JavaPluginInit init) {
     super(init);
@@ -46,22 +40,21 @@ public class ZEconomy extends JavaPlugin {
   @Override
   protected void setup() {
     super.setup();
-    getLogger().atInfo().log(
-      "Starting ZEconomy v%s", getPath().toAbsolutePath().toString()
-    );
-    reload();
-    commands.register(this);
-    events();
-    Tasks.register();
-
-  }
-
-
-  public void reload() {
     files();
     DatabaseFactory.createDatabaseClient();
+    commands.register(this);
+    events();
     this.database = DatabaseFactory.createDatabaseClient();
+
+    var plugin = HytaleServer.get().getPluginManager().getPlugin(new PluginIdentifier("com.dunystudios.hytale.plugins", "EcoAPI"));
+    if (plugin != null && plugin.isEnabled()) {
+      IEcoAPI.Service.setInstance(new IEcoOverwrite());
+      getLogger().atInfo().log(
+        "EcoAPI plugin detected, overwriting with ZEconomy implementation."
+      );
+    }
   }
+
 
   private void files() {
     this.config.load();
@@ -75,21 +68,9 @@ public class ZEconomy extends JavaPlugin {
     this.getEntityStoreRegistry().registerSystem(new BalanceHudTickingSystem());
   }
 
-  @Override protected void shutdown() {
-    super.shutdown();
-    DatabaseClient.saveAll();
-  }
 
   public static ZEconomy get() {
     return INSTANCE;
-  }
-
-  public static Path getPath() {
-    return get().getDataDirectory();
-  }
-
-  public static HytaleLogger getLog() {
-    return get().getLogger();
   }
 
   public static DatabaseClient getDatabase() {
