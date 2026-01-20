@@ -11,13 +11,13 @@ public class EcoCommand extends CommandBase {
   public EcoCommand(@Nonnull String name, @Nonnull String description) {
     super(name, description);
     this.requirePermission("zeconomy.command.eco");
-    this.addSubCommand(Commands.BALANCE_COMMAND);
-    this.addSubCommand(Commands.DEPOSIT_COMMAND);
-    this.addSubCommand(Commands.WITHDRAW_COMMAND);
+    this.addSubCommand(Commands.createBalanceCommand());
+    this.addSubCommand(Commands.createDepositCommand());
+    this.addSubCommand(Commands.createWithdrawCommand());
   }
 
   @Override
   protected void executeSync(@Nonnull CommandContext commandContext) {
-
+    throw new UnsupportedOperationException("This command is not meant to be executed directly.");
   }
 }

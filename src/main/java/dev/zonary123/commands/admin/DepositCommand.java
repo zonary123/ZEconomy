@@ -1,11 +1,14 @@
 package dev.zonary123.commands.admin;
 
+import com.hypixel.hytale.protocol.packets.interface_.NotificationStyle;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.command.system.CommandContext;
 import com.hypixel.hytale.server.core.command.system.arguments.system.RequiredArg;
 import com.hypixel.hytale.server.core.command.system.arguments.types.ArgTypes;
 import com.hypixel.hytale.server.core.command.system.basecommands.CommandBase;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
+import com.hypixel.hytale.server.core.universe.Universe;
+import com.hypixel.hytale.server.core.util.NotificationUtil;
 import dev.zonary123.Models.Currency;
 import dev.zonary123.api.ZEconomyApi;
 
@@ -59,11 +62,20 @@ public class DepositCommand extends CommandBase {
 
     if (result) {
       // Success
+      var packetHandler = playerRef.getPacketHandler();
       context.sendMessage(
         Message.raw(
           "Successfully deposited " + amount.toPlainString() + " " + curr.getName() + " to " +
             playerRef.getUsername() + "."
         )
+      );
+      NotificationUtil.sendNotification(
+        packetHandler,
+        Message.raw("Deposit").color("#FFD700"),
+        Message.raw(
+          "You have received " + amount.toPlainString() + " " + curr.getName() + "."
+        ),
+        NotificationStyle.Success
       );
     } else {
       // Failure
@@ -73,6 +85,18 @@ public class DepositCommand extends CommandBase {
             playerRef.getUsername() + "."
         )
       );
+      playerRef = Universe.get().getPlayer(context.sender().getUuid());
+      if (playerRef != null) {
+        var packetHandler = playerRef.getPacketHandler();
+        NotificationUtil.sendNotification(
+          packetHandler,
+          Message.raw("Deposit Failed").color("#FF0000"),
+          Message.raw(
+            "A deposit of " + amount.toPlainString() + " " + curr.getName() + " to your account has failed."
+          ),
+          NotificationStyle.Danger
+        );
+      }
     }
   }
 }
