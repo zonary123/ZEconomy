@@ -63,7 +63,7 @@ public class BalanceTopCommand extends CommandBase {
       builder.append("\n<#AAAAAA>- <#55FF55>")
         .append(username)
         .append("<#FFFF55>: <#FFFFAA>")
-        .append(currency.getFormat(balance));
+        .append(ZEconomyApi.getFormat(currencyId, balance));
     }
 
     // Pie con color fijo

@@ -55,22 +55,14 @@ public class Currency {
     COMPACT.setMaximumFractionDigits(3);
   }
 
-
-/*  private static final Cache<Long, String> CACHE = Caffeine.newBuilder()
-    .maximumSize(10_000)
-    .expireAfterAccess(5, TimeUnit.SECONDS)
-    .build();*/
-
   public String getFormat(BigDecimal value) {
     if (value == null) return apply("0");
 
-    long key = value.longValue();
+    BigDecimal clean = value.stripTrailingZeros();
 
-    return apply(
-      //CACHE.get(key, COMPACT::format)
-      apply(COMPACT.format(key))
-    );
+    return apply(COMPACT.format(clean.doubleValue()));
   }
+
 
   private String apply(String v) {
     String f = format;

@@ -1,5 +1,7 @@
 package dev.zonary123.zeconomy.api;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import dev.zonary123.zeconomy.Config.CCurrency;
 import dev.zonary123.zeconomy.Models.Account;
 import dev.zonary123.zeconomy.Models.Currency;
@@ -20,7 +22,6 @@ public class ZEconomyApi {
    * Get an account from cache by UUID.
    *
    * @param uuid The UUID of the account.
-   *
    * @return The account.
    */
   public static Account getAccount(UUID uuid) {
@@ -31,7 +32,6 @@ public class ZEconomyApi {
    * Find an account by UUID.
    *
    * @param uuid The UUID of the account.
-   *
    * @return The account.
    */
   public static Account findAccountByUuid(UUID uuid) {
@@ -44,7 +44,6 @@ public class ZEconomyApi {
    * Find an account by username.
    *
    * @param username The username of the account.
-   *
    * @return The account.
    */
   public static Account findAccountByUsername(String username) {
@@ -57,7 +56,6 @@ public class ZEconomyApi {
    *
    * @param uuid       The UUID of the account.
    * @param currencyId The currency to check the balance for.
-   *
    * @return The balance of the account.
    */
   public static BigDecimal getBalance(UUID uuid, String currencyId) {
@@ -76,9 +74,7 @@ public class ZEconomyApi {
    * @param uuid       The UUID of the account.
    * @param currencyId The currency to set the balance for.
    * @param amount     The amount to set the balance to.
-   *
    * @return True if the balance was set successfully, false otherwise.
-   *
    * @apiNote This method is valid, but it is recommended to use
    * {@link #setBalance(UUID, String, BigDecimal, String)}
    * to provide a reason for the transaction.
@@ -180,6 +176,18 @@ public class ZEconomyApi {
     return Objects.isNull(currencyId)
       ? CCurrency.PRIMARY_CURRENCY
       : CCurrency.CURRENCIES.getOrDefault(currencyId, CCurrency.PRIMARY_CURRENCY);
+  }
+
+  private static final Cache<BigDecimal, String> FORMAT_CACHE = Caffeine.newBuilder()
+    .maximumSize(1000)
+    .build();
+
+  /**
+   * Get the formatted string of a currency amount.
+   */
+  public static String getFormat(String currencyId, BigDecimal amount) {
+    Currency currency = getCurrency(currencyId);
+    return FORMAT_CACHE.get(amount, currency::getFormat);
   }
 
   /**
