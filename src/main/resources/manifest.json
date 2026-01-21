@@ -13,7 +13,7 @@
     "Website": "https://your-plugin-website.com",
     "ServerVersion": "*",
     "Dependencies": {
-        
+        "Zonary123:ZUtils": "*"
     },
     "OptionalDependencies": {
         "com.dunystudios.hytale.plugins:EcoAPI": "*"

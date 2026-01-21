@@ -23,7 +23,7 @@ public class SqlDatabase extends DatabaseClient {
   public void connect() {
     try {
       Class.forName("org.sqlite.JDBC");
-      var dbConfig = ZEconomy.get().getConfig().get().getDatabase();
+      var dbConfig = ZEconomy.getConfig().getDatabase();
       connection = DriverManager.getConnection(dbConfig.getUrl());
       createTablesIfNotExists();
       getLogger().atInfo().log("[SqlDatabase] Connected to SQLite!");
@@ -63,11 +63,33 @@ public class SqlDatabase extends DatabaseClient {
           FOREIGN KEY (uuid) REFERENCES accounts(uuid) ON DELETE CASCADE
       );
       """;
+    String transactionsTable = """
+      CREATE TABLE IF NOT EXISTS transactions (
+          id TEXT PRIMARY KEY,
+          uuid TEXT NOT NULL,
+          currencyid TEXT NOT NULL,
+          type TEXT NOT NULL,
+          amount NUMERIC NOT NULL,
+          reason TEXT NOT NULL,
+          processed INTEGER NOT NULL DEFAULT 1,
+          timestamp INTEGER NOT NULL,
+          FOREIGN KEY (uuid) REFERENCES accounts(uuid) ON DELETE CASCADE
+      );
+      """;
 
     try (Statement stmt = connection.createStatement()) {
       stmt.executeUpdate(accountsTable);
       stmt.executeUpdate(currenciesTable);
-      getLogger().atInfo().log("[SqlDatabase] Tables Accounts and Currencies created or verified!");
+      stmt.executeUpdate(transactionsTable);
+      stmt.execute("""
+        CREATE INDEX if NOT EXISTS idx_transactions_uuid
+        ON transactions(UUID);
+        """);
+      stmt.execute("""
+        CREATE INDEX if NOT EXISTS idx_transactions_timestamp
+        ON transactions(TIMESTAMP);
+        """);
+      getLogger().atInfo().log("[SqlDatabase] Tables verified!");
     } catch (Exception e) {
       getLogger().atSevere().log("Error creating tables: " + e.getMessage());
       e.printStackTrace();
@@ -310,16 +332,21 @@ public class SqlDatabase extends DatabaseClient {
   @Override
   public void addTransaction(Transaction transaction) {
     query("""
-      INSERT INTO transactions (uuid, currencyid, amount, type, timestamp)
-      VALUES (?, ?, ?, ?, ?)
+      INSERT INTO transactions
+      (id, uuid, currencyid, amount, type, reason, processed, timestamp)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
       """, ps -> {
-      setString(ps, 1, transaction.getAccountId().toString());
-      setString(ps, 2, transaction.getCurrencyId());
-      setBigDecimal(ps, 3, transaction.getAmount());
-      setString(ps, 4, transaction.getType().name());
-      setLong(ps, 5, transaction.getTimestamp());
+      setString(ps, 1, transaction.getId().toString());
+      setString(ps, 2, transaction.getAccountId().toString());
+      setString(ps, 3, transaction.getCurrencyId());
+      setBigDecimal(ps, 4, transaction.getAmount());
+      setString(ps, 5, transaction.getType().name());
+      setString(ps, 6, transaction.getReason());
+      ps.setInt(7, transaction.isProcessed() ? 1 : 0);
+      setLong(ps, 8, transaction.getTimestamp());
     }, null);
   }
+
 
   @Override public List<Transaction> getTransactions() {
     return List.of();

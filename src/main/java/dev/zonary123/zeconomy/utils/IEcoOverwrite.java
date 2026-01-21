@@ -1,7 +1,7 @@
-package dev.zonary123.utils;
+package dev.zonary123.zeconomy.utils;
 
 import com.dunystudios.hytale.plugins.IEcoAPI;
-import dev.zonary123.api.ZEconomyApi;
+import dev.zonary123.zeconomy.api.ZEconomyApi;
 
 import java.math.BigDecimal;
 import java.util.UUID;

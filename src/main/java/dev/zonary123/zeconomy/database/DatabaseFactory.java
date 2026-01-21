@@ -6,7 +6,7 @@ public class DatabaseFactory {
   public static DatabaseClient createDatabaseClient() {
     DatabaseClient client = ZEconomy.getDatabase();
     if (client != null) client.disconnect();
-    client = switch (ZEconomy.get().getConfig().get().getDatabase().getDatabaseType()) {
+    client = switch (ZEconomy.getConfig().getDatabase().getType()) {
       case MONGODB -> new MongoDBDatabase();
       case SQL -> new SqlDatabase();
       default -> new SqlDatabase();

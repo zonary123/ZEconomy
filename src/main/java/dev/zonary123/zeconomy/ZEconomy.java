@@ -1,4 +1,5 @@
-package dev.zonary123;
+package dev.zonary123.zeconomy;
+
 
 import com.dunystudios.hytale.plugins.IEcoAPI;
 import com.hypixel.hytale.common.plugin.PluginIdentifier;
@@ -7,20 +8,24 @@ import com.hypixel.hytale.server.core.event.events.player.PlayerDisconnectEvent;
 import com.hypixel.hytale.server.core.event.events.player.PlayerReadyEvent;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
-import com.hypixel.hytale.server.core.util.Config;
-import dev.zonary123.Config.CCurrency;
-import dev.zonary123.Config.ZEConfig;
-import dev.zonary123.commands.Commands;
-import dev.zonary123.database.DatabaseClient;
-import dev.zonary123.database.DatabaseFactory;
-import dev.zonary123.events.DisconnectPlayerEvent;
-import dev.zonary123.events.JoinPlayerEvent;
-import dev.zonary123.systems.BalanceHudTickingSystem;
-import dev.zonary123.utils.IEcoOverwrite;
+import dev.zonary123.zeconomy.Config.CCurrency;
+import dev.zonary123.zeconomy.Config.Config;
+import dev.zonary123.zeconomy.Config.Lang;
+import dev.zonary123.zeconomy.commands.Commands;
+import dev.zonary123.zeconomy.database.DatabaseClient;
+import dev.zonary123.zeconomy.database.DatabaseFactory;
+import dev.zonary123.zeconomy.events.DisconnectPlayerEvent;
+import dev.zonary123.zeconomy.events.JoinPlayerEvent;
+import dev.zonary123.zeconomy.systems.BalanceHudTickingSystem;
+import dev.zonary123.zeconomy.tasks.Tasks;
+import dev.zonary123.zeconomy.utils.IEcoOverwrite;
+import dev.zonary123.zutils.utils.async.AsyncContext;
+import dev.zonary123.zutils.utils.async.UtilsAsync;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.annotation.Nonnull;
+import java.nio.file.Path;
 
 @Getter
 @Setter
@@ -29,19 +34,20 @@ public class ZEconomy extends JavaPlugin {
 
   private Commands commands = new Commands();
   private DatabaseClient database;
-  private final Config<ZEConfig> config;
+  private Config config = new Config();
+  private Lang lang = new Lang();
+  public static final AsyncContext ASYNC_CONTEXT = UtilsAsync.createContext("ZEconomy", "-Worker");
 
   public ZEconomy(@Nonnull JavaPluginInit init) {
     super(init);
     INSTANCE = this;
-    this.config = this.withConfig("config", ZEConfig.CODEC);
+
   }
 
   @Override
   protected void setup() {
     super.setup();
     files();
-    DatabaseFactory.createDatabaseClient();
     commands.register(this);
     events();
     this.database = DatabaseFactory.createDatabaseClient();
@@ -53,12 +59,13 @@ public class ZEconomy extends JavaPlugin {
         "EcoAPI plugin detected, overwriting with ZEconomy implementation."
       );
     }
+    Tasks.register();
   }
 
 
   private void files() {
-    this.config.load();
-    this.config.save();
+    this.config = config.init();
+    this.lang = lang.init();
     CCurrency.init();
   }
 
@@ -73,9 +80,25 @@ public class ZEconomy extends JavaPlugin {
     return INSTANCE;
   }
 
+  public static Config getConfig() {
+    return get().config;
+  }
+
+  public static Lang getLang() {
+    return get().lang;
+  }
+
+  public static Path getPath() {
+    return get().getDataDirectory();
+  }
+
   public static DatabaseClient getDatabase() {
     return get().database;
   }
 
+  public void reload() {
+    files();
+    this.database = DatabaseFactory.createDatabaseClient();
+  }
 }
 

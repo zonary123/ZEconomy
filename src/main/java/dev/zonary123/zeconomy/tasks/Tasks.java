@@ -1,7 +1,7 @@
 package dev.zonary123.zeconomy.tasks;
 
-import dev.zonary123.zeconomy.ZEconomy;
 import dev.zonary123.zeconomy.database.DatabaseClient;
+import dev.zonary123.zutils.utils.async.UtilsAsync;
 
 import java.util.concurrent.TimeUnit;
 
@@ -11,6 +11,14 @@ import java.util.concurrent.TimeUnit;
  */
 public class Tasks {
   public static void register() {
-    ZEconomy.SCHEDULED_EXECUTOR_SERVICE.scheduleAtFixedRate(DatabaseClient::saveAll, 0L, 30L, TimeUnit.SECONDS);
+    UtilsAsync.getContext("ZEconomy").scheduleAtFixedRate(() -> {
+      try {
+        DatabaseClient.saveAll();
+      } catch (Exception e) {
+        e.printStackTrace();
+
+      }
+      return null;
+    }, 0L, 30L, TimeUnit.SECONDS);
   }
 }

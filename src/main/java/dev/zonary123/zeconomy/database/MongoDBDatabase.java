@@ -32,14 +32,14 @@ public class MongoDBDatabase extends DatabaseClient {
   @Override
   public void connect() {
     try {
-      var config = ZEconomy.get().getConfig().get().getDatabase();
+      var config = ZEconomy.getConfig().getDatabase();
 
       MongoClientSettings settings = MongoClientSettings.builder()
         .applyConnectionString(new ConnectionString(config.getUrl()))
         .applicationName("ZEconomy")
         .build();
       mongoClient = MongoClients.create(settings);
-      db = mongoClient.getDatabase(config.getDatabaseName());
+      db = mongoClient.getDatabase(config.getDatabase());
 
       accountsCollection = db.getCollection("accounts");
       transactionsCollection = db.getCollection("transactions");
